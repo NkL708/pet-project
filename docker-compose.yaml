@@ -3,10 +3,12 @@ version: "3"
 services:
     backend:
         build:
-            context: ./Dockerfiles
+            context: ./dockerfiles
             dockerfile: Dockerfile.backend
         ports:
             - "8000:8000"
+        volumes:
+            - "./backend:/home/backend"
         # depends_on:
         #     - db
     # db:
