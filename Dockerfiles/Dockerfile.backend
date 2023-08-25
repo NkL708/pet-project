@@ -1,8 +1,0 @@
-FROM python:latest
-
-WORKDIR /home
-RUN pip install django && \
-    django-admin startproject backend
-WORKDIR /home/backend
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
