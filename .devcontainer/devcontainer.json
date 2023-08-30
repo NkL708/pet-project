@@ -1,0 +1,17 @@
+{
+    "name": "Django Dev Container",
+    "image": "django-pet-backend",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.pythonPath": "/root/.local/share/virtualenvs/backend-kkzMsYdy/bin/python"
+			},
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"ms-python.vscode-pylance"
+			]
+		}
+	},
+    "appPort": [8000]
+}
