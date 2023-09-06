@@ -4,14 +4,20 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"python.pythonPath": "/root/.local/share/virtualenvs/backend-kkzMsYdy/bin/python"
+				"python.pythonPath": "/root/.local/share/virtualenvs/-x-v5uFv0/bin/python"
 			},
 			"extensions": [
 				"ms-azuretools.vscode-docker",
+				
 				"ms-python.python",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+
+				"tamasfe.even-better-toml"
 			]
 		}
 	},
-    "appPort": [8000]
+	"workspaceMount": "source=${localWorkspaceFolder}/backend,target=/home/backend,type=bind",
+	"workspaceFolder": "/home/backend",
+    "appPort": [8000],
+	"postCreateCommand": "pipenv run python manage.py runserver 0.0.0.0:8000"
 }
