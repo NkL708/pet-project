@@ -8,5 +8,6 @@ django = "*"
 djangorestframework = "*"
 python-decouple = "*"
 sentry-sdk = "*"
+psycopg2 = "*"
 
 [dev-packages]

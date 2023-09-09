@@ -4,7 +4,27 @@ services:
     backend:
         build:
             context: ./backend
-        ports:
-            - "8000:8000"
         volumes:
             - "./backend:/home/backend"
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+        environment:
+            DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+            SENTRY_DSN: ${SENTRY_DSN}
+            DB_NAME: ${DB_NAME}
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
+
+    db:
+        image: postgres:latest
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+volumes:
+    db_data:

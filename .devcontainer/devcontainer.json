@@ -1,6 +1,7 @@
 {
     "name": "Django Dev Container",
-    "image": "django-pet-backend",
+	"dockerComposeFile": "../docker-compose.yml",
+    "service": "backend",
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -16,8 +17,5 @@
 			]
 		}
 	},
-	"workspaceMount": "source=${localWorkspaceFolder}/backend,target=/home/backend,type=bind",
-	"workspaceFolder": "/home/backend",
-    "appPort": [8000],
-	"postCreateCommand": "pipenv run python manage.py runserver 0.0.0.0:8000"
+	"workspaceFolder": "/home/backend"
 }
