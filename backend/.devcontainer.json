@@ -1,5 +1,5 @@
 {
-    "name": "Django Dev Container",
+    "name": "Django dev container",
 	"dockerComposeFile": "../docker-compose.yml",
     "service": "backend",
 	"customizations": {
@@ -17,5 +17,6 @@
 			]
 		}
 	},
+	"shutdownAction": "none",
 	"workspaceFolder": "/home/backend"
 }

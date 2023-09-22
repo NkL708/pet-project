@@ -5,8 +5,8 @@ RUN apt update -y && \
     apt upgrade -y
 
 # Pipenv
-COPY Pipfile /home/backend/
 WORKDIR /home/backend
+COPY Pipfile .
 RUN pip install --upgrade pip && \
     pip install pipenv && \
     pipenv install

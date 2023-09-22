@@ -17,6 +17,16 @@ services:
             DB_USER: ${DB_USER}
             DB_PASSWORD: ${DB_PASSWORD}
 
+    frontend:
+        build:
+            context: ./frontend
+        volumes:
+            - "./frontend/src:/home/frontend/src"
+        ports:
+            - "4200:4200"
+        depends_on:
+            - backend
+
     db:
         image: postgres:latest
         volumes:
