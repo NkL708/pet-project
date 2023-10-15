@@ -6,8 +6,13 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
+djangorestframework-simplejwt = "*"
 python-decouple = "*"
-sentry-sdk = "*"
 psycopg2 = "*"
+setuptools = "*"
+pytest = "*"
+pytest-django = "*"
+
+sentry-sdk = "*"
 
 [dev-packages]
