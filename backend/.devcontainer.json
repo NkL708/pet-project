@@ -1,0 +1,22 @@
+{
+    "name": "Django dev container",
+	"dockerComposeFile": "../docker-compose.yml",
+    "service": "backend",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.pythonPath": "/root/.local/share/virtualenvs/-x-v5uFv0/bin/python"
+			},
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				
+				"donjayamanne.python-extension-pack",
+				"ms-python.vscode-pylance",
+
+				"tamasfe.even-better-toml"
+			]
+		}
+	},
+	"shutdownAction": "none",
+	"workspaceFolder": "/home/backend"
+}
