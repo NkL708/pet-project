@@ -5,8 +5,9 @@ services:
         build:
             context: ./backend
         volumes:
+            - "./backend/pytest.ini:/home/backend/pytest.ini"
+            - "./backend/core:/home/backend/core"
             - "./backend/api:/home/backend/api"
-            - "./backend/backend:/home/backend/backend"
         ports:
             - "8000:8000"
         depends_on:

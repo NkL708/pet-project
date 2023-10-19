@@ -1,7 +1,7 @@
-FROM python:latest
+FROM python:3.11
 
 ENV PYTHONDONTWRITEBYTECODE 1
-ENV DJANGO_SETTINGS_MODULE=backend.settings
+ENV DJANGO_SETTINGS_MODULE=core.settings
 
 # Update dependencies
 RUN apt update -y && \ 
