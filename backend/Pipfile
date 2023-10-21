@@ -9,10 +9,10 @@ djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 python-decouple = "*"
 psycopg2 = "*"
-setuptools = "*"
-pytest = "*"
-pytest-django = "*"
-
 sentry-sdk = "*"
 
 [dev-packages]
+flake8 = "*"
+pylint = "*"
+pytest = "*"
+pytest-django = "*"
