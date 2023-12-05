@@ -1,19 +1,19 @@
 from datetime import timedelta
 from pathlib import Path
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+# import sentry_sdk
+# from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-sentry_sdk.init(
-    dsn=config('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
-    send_default_pii=True,
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+# sentry_sdk.init(
+#     dsn=config('SENTRY_DSN'),
+#     integrations=[DjangoIntegration()],
+#     send_default_pii=True,
+#     traces_sample_rate=1.0,
+#     profiles_sample_rate=1.0,
+# )
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'api',
 ]
 
@@ -75,20 +76,20 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': """django.contrib.auth.
-            password_validation.UserAttributeSimilarityValidator""",
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'UserAttributeSimilarityValidator')
     },
     {
-        'NAME': """django.contrib.auth.
-            password_validation.MinimumLengthValidator""",
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'MinimumLengthValidator')
     },
     {
-        'NAME': """django.contrib.auth.
-            password_validation.CommonPasswordValidator""",
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'CommonPasswordValidator')
     },
     {
-        'NAME': """django.contrib.auth.
-            password_validation.NumericPasswordValidator""",
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'NumericPasswordValidator')
     },
 ]
 
