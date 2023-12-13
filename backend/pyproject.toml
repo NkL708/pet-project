@@ -1,0 +1,16 @@
+[tool.black]
+line-length = 79
+string-normalization = true
+
+[tool.pytest.ini_options]
+addopts = ["--cov=api"]
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+  "C0114",  # Missing module docstring
+  "C0115",  # Missing class docstring
+  "C0116"   # Missing function or method docstring
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
