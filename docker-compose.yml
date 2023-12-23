@@ -5,9 +5,8 @@ services:
         build:
             context: ./backend
         volumes:
-            - "./backend/pyproject.toml:/home/backend/pyproject.toml"
-            - "./backend/core:/home/backend/core"
-            - "./backend/api:/home/backend/api"
+            - "./backend/core:/home/nkl/backend/core"
+            - "./backend/api:/home/nkl/backend/api"
         ports:
             - "8000:8000"
         depends_on:

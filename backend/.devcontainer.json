@@ -1,21 +1,25 @@
 {
-    "name": "Django dev container",
+	"name": "Django dev container",
 	"dockerComposeFile": "../docker-compose.yml",
-    "service": "backend",
+	"service": "backend",
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"python.pythonPath": "/root/.local/share/virtualenvs/-x-v5uFv0/bin/python"
+				"python.pythonPath": "/home/nkl/.cache/pypoetry/virtualenvs/backend-VAatJKRE-py3.11/bin/python",
+				"mypy.runUsingActiveInterpreter": true
 			},
 			"extensions": [
 				"ms-azuretools.vscode-docker",
-				"donjayamanne.python-extension-pack",
+				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"ms-python.flake8",
+				"matangover.mypy",
+				"KevinRose.vsc-python-indent",
+				"donjayamanne.python-environment-manager",
 				"tamasfe.even-better-toml"
 			]
 		}
 	},
 	"shutdownAction": "none",
-	"workspaceFolder": "/home/backend"
+	"workspaceFolder": "/home/nkl/backend"
 }
