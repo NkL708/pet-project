@@ -1,14 +1,14 @@
-from django.contrib.auth.models import User
-from rest_framework.test import APIClient
-from rest_framework import status
 import pytest
+from django.contrib.auth.models import User
+from rest_framework import status
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_token_obtain_pair(test_user: User, api_client: APIClient) -> None:
+def test_token_obtain_pair(user_valid: User, api_client: APIClient) -> None:
     response = api_client.post(
         "/api/token/",
-        {"username": test_user.username, "password": "StrongP@ssw0rd123"},
+        {"username": user_valid.username, "password": "StrongP@ssw0rd123"},
     )
     assert response.status_code == status.HTTP_200_OK
 
@@ -17,10 +17,10 @@ def test_token_obtain_pair(test_user: User, api_client: APIClient) -> None:
 
 
 @pytest.mark.django_db
-def test_refresh_token(test_user: User, api_client: APIClient) -> None:
+def test_refresh_token(user_valid: User, api_client: APIClient) -> None:
     response = api_client.post(
         "/api/token/",
-        {"username": test_user.username, "password": "StrongP@ssw0rd123"},
+        {"username": user_valid.username, "password": "StrongP@ssw0rd123"},
     )
     assert response.status_code == status.HTTP_200_OK
 
@@ -37,10 +37,10 @@ def test_refresh_token(test_user: User, api_client: APIClient) -> None:
 
 
 @pytest.mark.django_db
-def test_verify_token(test_user: User, api_client: APIClient) -> None:
+def test_verify_token(user_valid: User, api_client: APIClient) -> None:
     response = api_client.post(
         "/api/token/",
-        {"username": test_user.username, "password": "StrongP@ssw0rd123"},
+        {"username": user_valid.username, "password": "StrongP@ssw0rd123"},
     )
     assert response.status_code == status.HTTP_200_OK
 

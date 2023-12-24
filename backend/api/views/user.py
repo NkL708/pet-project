@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.views import APIView
-from rest_framework.request import Request
 from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..serializers.user import ResetPasswordSerializer, UserSerializer
 from ..services.mail import send_reset_password_email
@@ -34,7 +34,8 @@ class UserView(APIView):
     @permission_classes([IsAuthenticated])
     def delete(self, request: Request, user_id: int) -> Response:
         user = get_object_or_404(User, pk=user_id)
-        if not (request.user == user or request.user.is_staff):
+
+        if not (request.user == user or request.user.is_staff):  # type: ignore
             return Response(status=status.HTTP_403_FORBIDDEN)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -51,7 +52,7 @@ class UserView(APIView):
         self, request: Request, user_id: int, partial_update: bool
     ) -> Response:
         user = get_object_or_404(User, pk=user_id)
-        if not (request.user == user or request.user.is_staff):
+        if not (request.user == user or request.user.is_staff):  # type: ignore
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         serializer = UserSerializer(

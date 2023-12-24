@@ -1,26 +1,27 @@
 # pylint: disable=too-few-public-methods
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib.auth.password_validation import validate_password
-from rest_framework.exceptions import ValidationError as DRFValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError as DRFValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ["id", "username", "password", "email", "is_staff"]
 
-    def validate_password(self, value: str) -> str:
-        user_data = self.initial_data
-        user = self.instance or User(**user_data)
+    def validate(self, attrs):
+        user = User(**attrs)
+        password = attrs["password"]
         try:
-            validate_password(value, user=user)
+            validate_password(password, user)
         except ValidationError as e:
-            raise DRFValidationError(e.messages) from e
-        return value
+            raise DRFValidationError({"password": e.messages}) from e
+        return attrs
 
     def create(self, validated_data) -> User:
         user = User(**validated_data)
