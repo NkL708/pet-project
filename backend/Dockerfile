@@ -7,8 +7,8 @@ RUN apt update && apt upgrade -y && \
     apt install zsh -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m nkl
-RUN chsh -s /bin/zsh nkl
+RUN useradd -m nkl && \
+    chsh -s /bin/zsh nkl
 
 WORKDIR /home/nkl/backend
 COPY pyproject.toml poetry.lock manage.py ./

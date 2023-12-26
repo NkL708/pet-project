@@ -16,7 +16,8 @@
 				"matangover.mypy",
 				"KevinRose.vsc-python-indent",
 				"donjayamanne.python-environment-manager",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"christian-kohler.path-intellisense"
 			]
 		}
 	},

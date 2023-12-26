@@ -22,7 +22,7 @@ services:
         build:
             context: ./frontend
         volumes:
-            - "./frontend/src:/home/frontend/src"
+            - "./frontend/src:/home/nkl/frontend/src"
         ports:
             - "4200:4200"
         depends_on:
