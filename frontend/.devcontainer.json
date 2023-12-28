@@ -10,7 +10,10 @@
 				"johnpapa.Angular2",
 				"esbenp.prettier-vscode",
 				"dbaeumer.vscode-eslint",
-				"christian-kohler.path-intellisense"
+				"christian-kohler.path-intellisense",
+				"ms-vscode.vscode-typescript-next",
+				"xabikos.JavaScriptSnippets",
+				"zh9528.file-size"
 			]
 		}
 	},

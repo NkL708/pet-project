@@ -17,7 +17,9 @@
 				"KevinRose.vsc-python-indent",
 				"donjayamanne.python-environment-manager",
 				"tamasfe.even-better-toml",
-				"christian-kohler.path-intellisense"
+				"christian-kohler.path-intellisense",
+				"zh9528.file-size",
+				"ecmel.vscode-html-css"
 			]
 		}
 	},
