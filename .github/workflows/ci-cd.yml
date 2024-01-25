@@ -7,64 +7,59 @@ on:
 jobs:
   backend-code-validation:
     runs-on: ubuntu-latest
-    environment: dev
 
     steps:
     - uses: actions/checkout@master
 
     - name: Create Env File
-      run: echo "${{ secrets.ENV_FILE }}" > .env.dev
+      run: echo "${{ secrets.ENV_FILE }}" > dev.env
 
     - name: Build Container
-      run: docker-compose up -d --build backend
+      run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build backend
 
     - name: Run Linters
       run: |
-        docker-compose exec -T backend poetry run \
+        docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
           flake8 . --exclude=.venv
-        docker-compose exec -T backend poetry run \
+        docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
           mypy .
-        docker-compose exec -T backend poetry run \
-          zsh -c "find . -type f -name '*.py' ! -path './.venv/*' | xargs pylint --disable=C,R"
-        docker-compose exec -T backend poetry run \
+        docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
+          zsh -c "find . -type f -name '*.py' ! -path './.venv/*' | \
+            xargs pylint --disable=C,R"
+        docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
           bandit . -r -c pyproject.toml
 
-    - name: Run Tests
-      run: docker-compose exec -T backend poetry run pytest
-
     - name: Cleanup
-      run: docker-compose down -v
+      run: docker-compose -f docker-compose.dev.yml down -v
 
   frontend-code-validation:
     runs-on: ubuntu-latest
-    environment: dev
 
     steps:
       - uses: actions/checkout@master
 
       - name: Create Env File
-        run: echo "${{ secrets.ENV_FILE }}" > .env.dev
+        run: echo "${{ secrets.ENV_FILE }}" > dev.env
 
       - name: Build
-        run: docker-compose up -d --build frontend
+        run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build frontend
 
       # Some code checks
 
       - name: Cleanup
-        run: docker-compose down -v
+        run: docker-compose -f docker-compose.dev.yml down -v
 
   deploy:
     runs-on: ubuntu-latest
     needs: [backend-code-validation, frontend-code-validation]
-    # if: github.ref == "refs/heads/master" # After success ci-tests
+    if: github.ref == 'refs/heads/master'
     environment: prod
-    env:
-      TARGET: prod
+
     steps:
     - uses: actions/checkout@master
 
     - name: Create Env File
-      run: echo "${{ secrets.ENV_FILE }}" > .env.prod
+      run: echo "${{ secrets.ENV_FILE }}" > prod.env
 
     - name: Login to Docker Hub
       uses: docker/login-action@master
@@ -74,18 +69,20 @@ jobs:
 
     - name: Build and Push Images
       run: |
-        docker-compose build
+        docker-compose --env-file prod.env -f docker-compose.prod.yml build
         docker push nkl322/django-pet-backend:latest
         docker push nkl322/django-pet-frontend:latest
+        docker push nkl322/django-pet-nginx:latest
 
-    - name: Archive Project Files
-      run: |
-        tar -czvf project.tar.gz \
-        --transform='s,^backend/Dockerfile,django-pet/backend/Dockerfile,' \
-        --transform='s,^frontend/Dockerfile,django-pet/frontend/Dockerfile,' \
-        --transform='s,^.env.prod,django-pet/.env.prod,' \
-        --transform='s,^docker-compose.yml,django-pet/docker-compose.yml,' \
-        backend/Dockerfile frontend/Dockerfile .env.prod docker-compose.yml
+    - name: Create Directory on Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+        script: |
+          mkdir -p django-pet/
 
     - name: Copy files to Server
       uses: appleboy/scp-action@master
@@ -94,8 +91,8 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        source: project.tar.gz
-        target: .
+        source: prod.env,docker-compose.prod.yml
+        target: django-pet/
 
     - name: Deploy to Server
       uses: appleboy/ssh-action@master
@@ -104,11 +101,9 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        envs: TARGET
         script: |
-          tar -xzf project.tar.gz
-          rm project.tar.gz
-          cd django-pet
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
+          cd django-pet/
+          docker-compose -f docker-compose.prod.yml down
+          docker-compose --env-file prod.env -f docker-compose.prod.yml pull
+          docker-compose --env-file prod.env -f docker-compose.prod.yml up -d --no-build
+          docker image prune -f

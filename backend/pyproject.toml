@@ -17,6 +17,7 @@ djangorestframework-simplejwt = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
 sentry-sdk = "*"
+gunicorn = "*"
 
 [tool.poetry.dev-dependencies]
 pylint = "*"
