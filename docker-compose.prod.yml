@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  nginx:
+    image: nkl322/django-pet-nginx:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    env_file:
+      - prod.env
+    depends_on:
+      - backend
+      - frontend
+
+  frontend:
+    image: nkl322/django-pet-frontend:latest
+    build:
+      context: ./frontend
+      target: build
+    env_file:
+      - prod.env
+
+  backend:
+    image: nkl322/django-pet-backend:latest
+    build:
+      context: ./backend
+      target: prod
+      args:
+        DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+    ports:
+      - "8000:8000"
+    env_file:
+      - prod.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:alpine
+    env_file:
+      - prod.env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
