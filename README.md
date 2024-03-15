@@ -6,10 +6,6 @@
 
 Detailed project description will be added later.
 
-### Code Status
-
-The main codebase is currently under active development in the [`dev` branch](https://github.com/NkL708/django-pet/tree/dev) of the repository.
-
 ## Technology Stack
 
 ### Backend
@@ -37,4 +33,4 @@ The main codebase is currently under active development in the [`dev` branch](ht
 ### Operating System
 
 - **Primary**: Ubuntu
-- **Container OS**: Debian (inside Docker)
+- **Container OS**: Alpine (inside Docker)
