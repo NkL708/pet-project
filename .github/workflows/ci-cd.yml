@@ -19,16 +19,17 @@ jobs:
     - name: Build Container
       run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build backend
 
-    - name: Code Quality Checks
+    - name: Run Code Quality Checks
       run: |
         docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
-          flake8 . --exclude=.venv
+          ruff check .
         docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
           mypy .
         docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
-          zsh -c "find . -type f -name '*.py' ! -path './.venv/*' | xargs pylint --disable=C,R"
-        docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
           bandit . -r -c pyproject.toml
+
+    - name: Run tests
+      run: docker-compose -f docker-compose.dev.yml run pytest
 
     - name: Cleanup
       run: docker-compose -f docker-compose.dev.yml down -v
