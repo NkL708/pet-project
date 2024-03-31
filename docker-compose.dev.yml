@@ -8,8 +8,6 @@ services:
       target: dev
     ports:
       - "4200:4200"
-    env_file:
-      - dev.env
     volumes:
       - "./frontend/src:/home/nkl/frontend/src"
 
