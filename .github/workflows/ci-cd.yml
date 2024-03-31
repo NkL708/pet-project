@@ -9,29 +9,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
-      with:
-        submodules: 'recursive'
+      - uses: actions/checkout@master
+        with:
+          submodules: "recursive"
 
-    - name: Create Env File
-      run: echo "${{ secrets.ENV_FILE }}" > dev.env
+      - name: Create Env File
+        run: echo "${{ secrets.ENV_FILE }}" > dev.env
 
-    - name: Build Container
-      run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build backend
+      - name: Build Container
+        run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build backend
 
-    - name: Code Quality Checks
-      run: |
-        docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
-          flake8 . --exclude=.venv
-        docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
-          mypy .
-        docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
-          zsh -c "find . -type f -name '*.py' ! -path './.venv/*' | xargs pylint --disable=C,R"
-        docker-compose -f docker-compose.dev.yml run --rm backend poetry run \
-          bandit . -r -c pyproject.toml
+      - name: Run Code Quality Checks
+        run: |
+          docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
+            ruff check .
+          docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
+            mypy .
+          docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
+            bandit . -r -c pyproject.toml
 
-    - name: Cleanup
-      run: docker-compose -f docker-compose.dev.yml down -v
+      - name: Run tests
+        run: |
+          docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
+            pytest
+      - name: Cleanup
+        run: docker-compose -f docker-compose.dev.yml down -v
 
   frontend-code-validation:
     runs-on: ubuntu-latest
@@ -39,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
 
       - name: Create Env File
         run: echo "${{ secrets.ENV_FILE }}" > dev.env
@@ -59,56 +61,56 @@ jobs:
     environment: prod
 
     steps:
-    - uses: actions/checkout@master
-      with:
-        submodules: 'recursive'
+      - uses: actions/checkout@master
+        with:
+          submodules: "recursive"
 
-    - name: Create Env File
-      run: echo "${{ secrets.ENV_FILE }}" > prod.env
+      - name: Create Env File
+        run: echo "${{ secrets.ENV_FILE }}" > prod.env
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@master
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@master
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-    - name: Build and Push Images
-      run: |
-        docker-compose --env-file prod.env -f docker-compose.prod.yml build
-        docker push nkl322/django-pet-backend:latest
-        docker push nkl322/django-pet-frontend:latest
-        docker push nkl322/django-pet-nginx:latest
+      - name: Build and Push Images
+        run: |
+          docker-compose --env-file prod.env -f docker-compose.prod.yml build
+          docker push nkl322/django-pet-backend:latest
+          docker push nkl322/django-pet-frontend:latest
+          docker push nkl322/django-pet-nginx:latest
 
-    - name: Create Directory on Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        script: |
-          mkdir -p django-pet/
+      - name: Create Directory on Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          script: |
+            mkdir -p django-pet/
 
-    - name: Copy files to Server
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        source: prod.env,docker-compose.prod.yml
-        target: django-pet/
+      - name: Copy files to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          source: prod.env,docker-compose.prod.yml
+          target: django-pet/
 
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        script: |
-          cd django-pet/
-          docker-compose -f docker-compose.prod.yml down
-          docker-compose --env-file prod.env -f docker-compose.prod.yml pull
-          docker-compose --env-file prod.env -f docker-compose.prod.yml up -d --no-build
-          docker image prune -f
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
+          script: |
+            cd django-pet/
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose --env-file prod.env -f docker-compose.prod.yml pull
+            docker-compose --env-file prod.env -f docker-compose.prod.yml up -d --no-build
+            docker image prune -f
