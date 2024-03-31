@@ -14,7 +14,7 @@ jobs:
           submodules: "recursive"
 
       - name: Create Env File
-        run: echo "${{ secrets.ENV_FILE }}" > dev.env
+        run: echo "${{ secrets.DEV_ENV_FILE }}" > dev.env
 
       - name: Build Container
         run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build backend
@@ -30,10 +30,11 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose -f docker-compose.dev.yml exec -T backend poetry run \
+          docker-compose --env-file dev.env -f docker-compose.dev.yml exec -T backend poetry run \
             pytest
+
       - name: Cleanup
-        run: docker-compose -f docker-compose.dev.yml down -v
+        run: docker-compose --env-file dev.env -f docker-compose.dev.yml down -v
 
   frontend-code-validation:
     runs-on: ubuntu-latest
@@ -44,7 +45,7 @@ jobs:
           submodules: "recursive"
 
       - name: Create Env File
-        run: echo "${{ secrets.ENV_FILE }}" > dev.env
+        run: echo "${{ secrets.DEV_ENV_FILE }}" > dev.env
 
       - name: Build
         run: docker-compose --env-file dev.env -f docker-compose.dev.yml up -d --build frontend
@@ -52,7 +53,7 @@ jobs:
       # Some code checks
 
       - name: Cleanup
-        run: docker-compose -f docker-compose.dev.yml down -v
+        run: docker-compose --env-file dev.env -f docker-compose.dev.yml down -v
 
   deploy:
     runs-on: ubuntu-latest
@@ -66,7 +67,7 @@ jobs:
           submodules: "recursive"
 
       - name: Create Env File
-        run: echo "${{ secrets.ENV_FILE }}" > prod.env
+        run: echo "${{ secrets.PROD_ENV_FILE }}" > prod.env
 
       - name: Login to Docker Hub
         uses: docker/login-action@master
@@ -74,9 +75,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-      - name: Build and Push Images
+      - name: Build Images
         run: |
-          docker-compose --env-file prod.env -f docker-compose.prod.yml build
+          COMMIT_SHA=${{ github.sha }} \
+          BUILD_SOURCE_MAP=true \
+            docker-compose --env-file prod.env -f docker-compose.prod.yml build
+
+      - name: Push Images
+        run: |
           docker push nkl322/django-pet-backend:latest
           docker push nkl322/django-pet-frontend:latest
           docker push nkl322/django-pet-nginx:latest
@@ -98,7 +104,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-          source: prod.env,docker-compose.prod.yml
+          source: prod.env,docker-compose.yml
           target: django-pet/
 
       - name: Deploy to Server
@@ -110,7 +116,7 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: |
             cd django-pet/
-            docker-compose -f docker-compose.prod.yml down
-            docker-compose --env-file prod.env -f docker-compose.prod.yml pull
-            docker-compose --env-file prod.env -f docker-compose.prod.yml up -d --no-build
+            docker-compose --env-file prod.env -f docker-compose.yml down
+            docker-compose --env-file prod.env pull
+            docker-compose --env-file prod.env up -d
             docker image prune -f
