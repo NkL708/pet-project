@@ -1,0 +1,30 @@
+services:
+  nginx:
+    image: nkl322/django-pet-nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+
+  frontend:
+    image: nkl322/django-pet-frontend:latest
+    env_file:
+      - prod.env
+
+  backend:
+    image: nkl322/django-pet-backend:latest
+    env_file:
+      - prod.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:alpine
+    env_file:
+      - prod.env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

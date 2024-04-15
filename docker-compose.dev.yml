@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   frontend:
     image: nkl322/django-pet-frontend:latest
@@ -8,6 +6,8 @@ services:
       target: dev
     ports:
       - "4200:4200"
+    env_file:
+      - dev.env
     volumes:
       - "./frontend/src:/home/nkl/frontend/src"
 
