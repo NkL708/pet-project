@@ -13,6 +13,8 @@ services:
       COMMIT_SHA: ${COMMIT_SHA:-}
     volumes:
       - "./frontend/src:/home/nkl/frontend/src"
+    networks:
+      - app_network
 
   backend:
     image: nkl322/django-pet-backend:latest
@@ -26,6 +28,8 @@ services:
     volumes:
       - "./backend/core:/home/nkl/backend/core"
       - "./backend/api:/home/nkl/backend/api"
+    networks:
+      - app_network
     depends_on:
       - db
 
@@ -35,6 +39,14 @@ services:
       - dev_db_data:/var/lib/postgresql/data
     env_file:
       - dev.env
+    networks:
+      - app_network
 
 volumes:
   dev_db_data:
+
+networks:
+  app_network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1400"
