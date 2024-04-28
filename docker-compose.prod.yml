@@ -40,7 +40,7 @@ services:
     env_file:
       - prod.env
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - prod_db_data:/var/lib/postgresql/data
 
 volumes:
-  db_data:
+  prod_db_data:

@@ -29,9 +29,9 @@ services:
   db:
     image: postgres:alpine
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - dev_db_data:/var/lib/postgresql/data
     env_file:
       - dev.env
 
 volumes:
-  db_data:
+  dev_db_data:
