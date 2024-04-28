@@ -8,6 +8,9 @@ services:
       - "4200:4200"
     env_file:
       - dev.env
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
+      COMMIT_SHA: ${COMMIT_SHA:-}
     volumes:
       - "./frontend/src:/home/nkl/frontend/src"
 
