@@ -1,16 +1,20 @@
 services:
   nginx:
+    container_name: nginx
     image: nkl322/django-pet-nginx:latest
     build:
       context: .
       dockerfile: Dockerfile.nginx
     ports:
       - "80:80"
+    networks:
+      - app_network
     depends_on:
       - backend
       - frontend
 
   frontend:
+    container_name: frontend
     image: nkl322/django-pet-frontend:latest
     build:
       context: ./frontend
@@ -22,25 +26,82 @@ services:
         SENTRY_PROJECT: ${SENTRY_PROJECT_FRONTEND}
         BUILD_SOURCE_MAP: ${BUILD_SOURCE_MAP:-false}
         COMMIT_SHA: ${COMMIT_SHA:-}
+    networks:
+      - app_network
 
   backend:
+    container_name: backend
     image: nkl322/django-pet-backend:latest
     build:
       context: ./backend
       target: prod
       args:
         DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+        IS_STATICFILES_NEEDED: "true"
+    command: sh -c "poetry run python manage.py migrate && \
+      poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     env_file:
       - prod.env
+    networks:
+      - app_network
     depends_on:
-      - db
+      - postgres
 
-  db:
+  celery_worker:
+    container_name: celery_worker
+    image: nkl322/django-pet-backend:latest
+    build:
+      context: ./backend
+      target: prod
+    command: poetry run celery -A core worker --loglevel=info
+    env_file:
+      - prod.env
+    volumes:
+      - "./backend/core:/home/nkl/backend/core"
+      - "./backend/api:/home/nkl/backend/api"
+    networks:
+      - app_network
+    depends_on:
+      - redis
+
+  celery_beat:
+    container_name: celery_beat
+    image: nkl322/django-pet-backend:latest
+    build:
+      context: ./backend
+      target: prod
+    command: poetry run celery -A core beat --loglevel=info
+    env_file:
+      - prod.env
+    volumes:
+      - "./backend/core:/home/nkl/backend/core"
+      - "./backend/api:/home/nkl/backend/api"
+    networks:
+      - app_network
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+  postgres:
+    container_name: postgres
     image: postgres:alpine
     env_file:
       - prod.env
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - prod_db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
 volumes:
-  db_data:
+  prod_db_data:
+
+networks:
+  app_network:
+    driver: bridge
