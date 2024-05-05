@@ -1,5 +1,6 @@
 services:
   frontend:
+    container_name: frontend
     image: nkl322/django-pet-frontend:latest
     build:
       context: ./frontend
@@ -17,10 +18,13 @@ services:
       - app_network
 
   backend:
+    container_name: backend
     image: nkl322/django-pet-backend:latest
     build:
       context: ./backend
       target: dev
+    command: sh -c "poetry run python manage.py migrate &&
+      poetry run python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     env_file:
@@ -31,9 +35,52 @@ services:
     networks:
       - app_network
     depends_on:
-      - db
+      - postgres
 
-  db:
+  celery_worker:
+    container_name: celery_worker
+    image: nkl322/django-pet-backend:latest
+    build:
+      context: ./backend
+      target: dev
+    command: poetry run celery -A core worker --loglevel=info
+    env_file:
+      - dev.env
+    volumes:
+      - "./backend/core:/home/nkl/backend/core"
+      - "./backend/api:/home/nkl/backend/api"
+    networks:
+      - app_network
+    depends_on:
+      - redis
+
+  celery_beat:
+    container_name: celery_beat
+    image: nkl322/django-pet-backend:latest
+    build:
+      context: ./backend
+      target: dev
+    command: poetry run celery -A core beat --loglevel=info
+    env_file:
+      - dev.env
+    volumes:
+      - "./backend/core:/home/nkl/backend/core"
+      - "./backend/api:/home/nkl/backend/api"
+    networks:
+      - app_network
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+  postgres:
+    container_name: postgres
     image: postgres:alpine
     volumes:
       - dev_db_data:/var/lib/postgresql/data
