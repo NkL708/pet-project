@@ -44,8 +44,6 @@ services:
       context: ./backend
       target: dev
     command: poetry run celery -A core worker --loglevel=info
-    env_file:
-      - dev.env
     volumes:
       - "./backend/core:/home/nkl/backend/core"
       - "./backend/api:/home/nkl/backend/api"
@@ -61,8 +59,6 @@ services:
       context: ./backend
       target: dev
     command: poetry run celery -A core beat --loglevel=info
-    env_file:
-      - dev.env
     volumes:
       - "./backend/core:/home/nkl/backend/core"
       - "./backend/api:/home/nkl/backend/api"

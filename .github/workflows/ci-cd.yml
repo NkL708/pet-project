@@ -84,7 +84,6 @@ jobs:
       - name: Push Images
         run: |
           docker push nkl322/django-pet-backend:latest
-          docker push nkl322/django-pet-frontend:latest
           docker push nkl322/django-pet-nginx:latest
 
       - name: Create Directory on Server
@@ -116,7 +115,7 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: |
             cd django-pet/
-            docker-compose --env-file prod.env -f docker-compose.yml down
+            docker-compose --env-file prod.env down
             docker-compose --env-file prod.env pull
             docker-compose --env-file prod.env up -d
             docker image prune -f
