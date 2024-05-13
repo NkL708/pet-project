@@ -103,7 +103,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-          source: prod.env,docker-compose.yml
+          source: prod.env,docker-compose.prod.yml
           target: django-pet/
 
       - name: Deploy to Server
@@ -115,7 +115,7 @@ jobs:
           passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
           script: |
             cd django-pet/
-            docker-compose --env-file prod.env down
-            docker-compose --env-file prod.env pull
-            docker-compose --env-file prod.env up -d
+            docker-compose --env-file prod.env -f docker-compose.prod.yml down
+            docker-compose --env-file prod.env -f docker-compose.prod.yml pull
+            docker-compose --env-file prod.env -f docker-compose.prod.yml up -d --no-build
             docker image prune -f
