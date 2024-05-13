@@ -55,6 +55,8 @@ services:
       context: ./backend
       target: prod
     command: poetry run celery -A core worker --loglevel=info
+    env_file:
+      - prod.env
     networks:
       - app_network
     depends_on:
@@ -67,6 +69,8 @@ services:
       context: ./backend
       target: prod
     command: poetry run celery -A core beat --loglevel=info
+    env_file:
+      - prod.env
     networks:
       - app_network
     depends_on:
@@ -75,6 +79,8 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
+    env_file:
+      - prod.env
     ports:
       - "6379:6379"
     networks:
