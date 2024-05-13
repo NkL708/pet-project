@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nginx
+      target: prod
     ports:
       - "80:80"
     networks:
