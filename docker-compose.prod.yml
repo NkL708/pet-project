@@ -79,10 +79,12 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
-    env_file:
-      - prod.env
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
+    volumes:
+      - "./redis.conf:/usr/local/etc/redis/redis.conf"
+      - "prod_redis_data:/data"
     networks:
       - app_network
 
@@ -98,6 +100,7 @@ services:
 
 volumes:
   prod_db_data:
+  prod_redis_data:
 
 networks:
   app_network:
