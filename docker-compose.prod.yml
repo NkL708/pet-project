@@ -8,8 +8,6 @@ services:
       target: prod
     ports:
       - "80:80"
-    networks:
-      - app_network
     depends_on:
       - backend
       - frontend
@@ -27,8 +25,6 @@ services:
         SENTRY_PROJECT: ${SENTRY_PROJECT_FRONTEND}
         BUILD_SOURCE_MAP: ${BUILD_SOURCE_MAP:-false}
         COMMIT_SHA: ${COMMIT_SHA:-}
-    networks:
-      - app_network
 
   backend:
     container_name: backend
@@ -43,8 +39,6 @@ services:
       poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     env_file:
       - prod.env
-    networks:
-      - app_network
     depends_on:
       - postgres
 
@@ -57,8 +51,6 @@ services:
     command: poetry run celery -A core worker --loglevel=info
     env_file:
       - prod.env
-    networks:
-      - app_network
     depends_on:
       - redis
 
@@ -71,8 +63,6 @@ services:
     command: poetry run celery -A core beat --loglevel=info
     env_file:
       - prod.env
-    networks:
-      - app_network
     depends_on:
       - redis
 
@@ -84,9 +74,7 @@ services:
       - "6379:6379"
     volumes:
       - "./redis.conf:/usr/local/etc/redis/redis.conf"
-      - "prod_redis_data:/data"
-    networks:
-      - app_network
+      - "redis_data_prod:/data"
 
   postgres:
     container_name: postgres
@@ -94,14 +82,8 @@ services:
     env_file:
       - prod.env
     volumes:
-      - prod_db_data:/var/lib/postgresql/data
-    networks:
-      - app_network
+      - db_data_prod:/var/lib/postgresql/data
 
 volumes:
-  prod_db_data:
-  prod_redis_data:
-
-networks:
-  app_network:
-    driver: bridge
+  db_data_prod:
+  redis_data_prod:
