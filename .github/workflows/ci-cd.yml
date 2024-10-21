@@ -13,6 +13,11 @@ jobs:
         with:
           submodules: "recursive"
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+
       - name: Create Env File
         run: echo "${{ secrets.DEV_ENV_FILE }}" > dev.env
 
@@ -43,6 +48,11 @@ jobs:
       - uses: actions/checkout@master
         with:
           submodules: "recursive"
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
 
       - name: Create Env File
         run: echo "${{ secrets.DEV_ENV_FILE }}" > dev.env
