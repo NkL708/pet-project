@@ -1,6 +1,6 @@
-FROM nkl322/django-pet-frontend as frontend-build
-FROM nkl322/django-pet-backend as backend-build
-FROM nginx:alpine as prod
+FROM nkl322/django-pet-frontend AS frontend-build
+FROM nkl322/django-pet-backend AS backend-build
+FROM nginx:alpine AS prod
 RUN mkdir -p /var/lib/nginx/tmp && \
     chown -R nginx:nginx /var/cache/nginx /usr/share/nginx/html /var/lib/nginx
 COPY --from=frontend-build /home/nkl/frontend/dist/frontend /usr/share/nginx/html
